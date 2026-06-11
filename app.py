@@ -9,7 +9,7 @@ from data_manager import (
 # --- CONFIGURATION ---
 init_data()
 st.set_page_config(page_title="🏆 World Cup Predictor", layout="wide")
-st.title("🏆 Tourney Master (Excel Backend)")
+st.title("🏆 FIFA WCUP 26 - JUAAaaa")
 
 # --- CDN FLAG HELPER ---
 def get_flag_html(team_name):
