@@ -48,11 +48,11 @@ def update_match_and_scores(match_id, act_A, act_B):
     matches_df = load_table(MATCHES_FILE)
     predictions_df = load_table(PREDICTIONS_FILE)
     
-    matches_df.loc[matches_df['match_id'] == match_id, ['actual_score_A', 'actual_score_B', 'status']] = [act_A, act_B, 'Finished']
+    matches_df.loc[matches_df['match_id'] == match_id, ['actual_score_a', 'actual_score_b', 'status']] = [act_A, act_B, 'Finished']
     save_table(matches_df, MATCHES_FILE)
     
     for idx, row in predictions_df[predictions_df['match_id'] == match_id].iterrows():
-        pts = calculate_points(row['pred_score_A'], row['pred_score_B'], act_A, act_B)
+        pts = calculate_points(row['pred_score_a'], row['pred_score_b'], act_A, act_B)
         predictions_df.at[idx, 'points_earned'] = pts
         
     save_table(predictions_df, PREDICTIONS_FILE)
@@ -60,7 +60,7 @@ def update_match_and_scores(match_id, act_A, act_B):
 def update_match_teams(match_id, new_team_A, new_team_B):
     """Updates placeholder names to actual qualified teams."""
     matches_df = load_table(MATCHES_FILE)
-    matches_df.loc[matches_df['match_id'] == match_id, ['team_A', 'team_B']] = [new_team_A, new_team_B]
+    matches_df.loc[matches_df['match_id'] == match_id, ['team_a', 'team_b']] = [new_team_A, new_team_B]
     save_table(matches_df, MATCHES_FILE)
 
 def delete_tournament(tournament_name):
