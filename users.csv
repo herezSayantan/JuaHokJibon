@@ -1,0 +1,4 @@
+user_id,username,password,role,status
+1,admin,240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9,admin,active
+2,Sayantan,8b14b8be0278c0ddaf6beb126bbb1efe85af19e74f874d565aa4bce2e409f4a3,user,active
+3,Riju,8b14b8be0278c0ddaf6beb126bbb1efe85af19e74f874d565aa4bce2e409f4a3,user,active

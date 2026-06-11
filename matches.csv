@@ -1,0 +1,105 @@
+match_id,tournament,team_A,team_B,actual_score_A,actual_score_B,status
+1,FIFA World Cup 2026,Mexico,South Africa,,,Pending
+2,FIFA World Cup 2026,South Korea,Czechia,,,Pending
+3,FIFA World Cup 2026,Canada,Bosnia and Herzegovina,,,Pending
+4,FIFA World Cup 2026,USA,Paraguay,,,Pending
+5,FIFA World Cup 2026,Qatar,Switzerland,,,Pending
+6,FIFA World Cup 2026,Brazil,Morocco,,,Pending
+7,FIFA World Cup 2026,Haiti,Scotland,,,Pending
+8,FIFA World Cup 2026,Australia,Türkiye,,,Pending
+9,FIFA World Cup 2026,Germany,Curaçao,,,Pending
+10,FIFA World Cup 2026,Netherlands,Japan,,,Pending
+11,FIFA World Cup 2026,Ivory Coast,Ecuador,,,Pending
+12,FIFA World Cup 2026,Sweden,Tunisia,,,Pending
+13,FIFA World Cup 2026,Spain,Cape Verde,,,Pending
+14,FIFA World Cup 2026,Belgium,Egypt,,,Pending
+15,FIFA World Cup 2026,Saudi Arabia,Uruguay,,,Pending
+16,FIFA World Cup 2026,Iran,New Zealand,,,Pending
+17,FIFA World Cup 2026,France,Senegal,,,Pending
+18,FIFA World Cup 2026,Iraq,Norway,,,Pending
+19,FIFA World Cup 2026,Argentina,Algeria,,,Pending
+20,FIFA World Cup 2026,Austria,Jordan,,,Pending
+21,FIFA World Cup 2026,Ghana,Panama,,,Pending
+22,FIFA World Cup 2026,England,Croatia,,,Pending
+23,FIFA World Cup 2026,Portugal,Congo DR,,,Pending
+24,FIFA World Cup 2026,Uzbekistan,Colombia,,,Pending
+25,FIFA World Cup 2026,Czechia,South Africa,,,Pending
+26,FIFA World Cup 2026,Switzerland,Bosnia and Herzegovina,,,Pending
+27,FIFA World Cup 2026,Canada,Qatar,,,Pending
+28,FIFA World Cup 2026,Mexico,South Korea,,,Pending
+29,FIFA World Cup 2026,Brazil,Haiti,,,Pending
+30,FIFA World Cup 2026,Scotland,Morocco,,,Pending
+31,FIFA World Cup 2026,Türkiye,Paraguay,,,Pending
+32,FIFA World Cup 2026,USA,Australia,,,Pending
+33,FIFA World Cup 2026,Germany,Ivory Coast,,,Pending
+34,FIFA World Cup 2026,Ecuador,Curaçao,,,Pending
+35,FIFA World Cup 2026,Netherlands,Sweden,,,Pending
+36,FIFA World Cup 2026,Tunisia,Japan,,,Pending
+37,FIFA World Cup 2026,Uruguay,Cape Verde,,,Pending
+38,FIFA World Cup 2026,Spain,Saudi Arabia,,,Pending
+39,FIFA World Cup 2026,Belgium,Iran,,,Pending
+40,FIFA World Cup 2026,New Zealand,Egypt,,,Pending
+41,FIFA World Cup 2026,Norway,Senegal,,,Pending
+42,FIFA World Cup 2026,France,Iraq,,,Pending
+43,FIFA World Cup 2026,Argentina,Austria,,,Pending
+44,FIFA World Cup 2026,Jordan,Algeria,,,Pending
+45,FIFA World Cup 2026,Portugal,Uzbekistan,,,Pending
+46,FIFA World Cup 2026,Colombia,Congo DR,,,Pending
+47,FIFA World Cup 2026,England,Ghana,,,Pending
+48,FIFA World Cup 2026,Panama,Croatia,,,Pending
+49,FIFA World Cup 2026,South Africa,South Korea,,,Pending
+50,FIFA World Cup 2026,Czechia,Mexico,,,Pending
+51,FIFA World Cup 2026,Bosnia and Herzegovina,Qatar,,,Pending
+52,FIFA World Cup 2026,Switzerland,Canada,,,Pending
+53,FIFA World Cup 2026,Morocco,Haiti,,,Pending
+54,FIFA World Cup 2026,Scotland,Brazil,,,Pending
+55,FIFA World Cup 2026,Paraguay,Australia,,,Pending
+56,FIFA World Cup 2026,Türkiye,USA,,,Pending
+57,FIFA World Cup 2026,Curaçao,Ivory Coast,,,Pending
+58,FIFA World Cup 2026,Ecuador,Germany,,,Pending
+59,FIFA World Cup 2026,Japan,Sweden,,,Pending
+60,FIFA World Cup 2026,Tunisia,Netherlands,,,Pending
+61,FIFA World Cup 2026,Egypt,Iran,,,Pending
+62,FIFA World Cup 2026,New Zealand,Belgium,,,Pending
+63,FIFA World Cup 2026,Cape Verde,Saudi Arabia,,,Pending
+64,FIFA World Cup 2026,Uruguay,Spain,,,Pending
+65,FIFA World Cup 2026,Senegal,Iraq,,,Pending
+66,FIFA World Cup 2026,Norway,France,,,Pending
+67,FIFA World Cup 2026,Algeria,Austria,,,Pending
+68,FIFA World Cup 2026,Jordan,Argentina,,,Pending
+69,FIFA World Cup 2026,Congo DR,Uzbekistan,,,Pending
+70,FIFA World Cup 2026,Colombia,Portugal,,,Pending
+71,FIFA World Cup 2026,Croatia,Ghana,,,Pending
+72,FIFA World Cup 2026,Panama,England,,,Pending
+73,FIFA World Cup 2026,Winner Group A,Runner-up Group C,,,Pending
+74,FIFA World Cup 2026,Runner-up Group A,Runner-up Group B,,,Pending
+75,FIFA World Cup 2026,Winner Group B,3rd Group A/B/C,,,Pending
+76,FIFA World Cup 2026,Winner Group C,3rd Group D/E/F,,,Pending
+77,FIFA World Cup 2026,Winner Group F,Runner-up Group F,,,Pending
+78,FIFA World Cup 2026,Winner Group D,3rd Group G/H/I,,,Pending
+79,FIFA World Cup 2026,Winner Group E,Runner-up Group D,,,Pending
+80,FIFA World Cup 2026,Winner Group G,3rd Group J/K/L,,,Pending
+81,FIFA World Cup 2026,Winner Group H,Runner-up Group E,,,Pending
+82,FIFA World Cup 2026,Winner Group I,Runner-up Group G,,,Pending
+83,FIFA World Cup 2026,Winner Group J,Runner-up Group H,,,Pending
+84,FIFA World Cup 2026,Winner Group K,Runner-up Group I,,,Pending
+85,FIFA World Cup 2026,Winner Group L,Runner-up Group J,,,Pending
+86,FIFA World Cup 2026,Runner-up Group K,Runner-up Group L,,,Pending
+87,FIFA World Cup 2026,3rd Group B/C/F,3rd Group A/D/E,,,Pending
+88,FIFA World Cup 2026,3rd Group G/H/K,3rd Group I/J/L,,,Pending
+89,FIFA World Cup 2026,Winner Match 73,Winner Match 75,,,Pending
+90,FIFA World Cup 2026,Winner Match 74,Winner Match 76,,,Pending
+91,FIFA World Cup 2026,Winner Match 77,Winner Match 79,,,Pending
+92,FIFA World Cup 2026,Winner Match 78,Winner Match 80,,,Pending
+93,FIFA World Cup 2026,Winner Match 81,Winner Match 83,,,Pending
+94,FIFA World Cup 2026,Winner Match 82,Winner Match 84,,,Pending
+95,FIFA World Cup 2026,Winner Match 85,Winner Match 87,,,Pending
+96,FIFA World Cup 2026,Winner Match 86,Winner Match 88,,,Pending
+97,FIFA World Cup 2026,Winner Match 89,Winner Match 90,,,Pending
+98,FIFA World Cup 2026,Winner Match 91,Winner Match 92,,,Pending
+99,FIFA World Cup 2026,Winner Match 93,Winner Match 94,,,Pending
+100,FIFA World Cup 2026,Winner Match 95,Winner Match 96,,,Pending
+101,FIFA World Cup 2026,Winner Match 97,Winner Match 98,,,Pending
+102,FIFA World Cup 2026,Winner Match 99,Winner Match 100,,,Pending
+103,FIFA World Cup 2026,Loser Match 101,Loser Match 102,,,Pending
+104,FIFA World Cup 2026,Winner Match 101,Winner Match 102,,,Pending
