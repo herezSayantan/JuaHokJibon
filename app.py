@@ -8,8 +8,8 @@ from data_manager import (
 
 # --- CONFIGURATION ---
 init_data()
-st.set_page_config(page_title="🏆 JUA HOK JIBON", layout="wide")
-st.title("🏆 FIFA 2026 Predict 2 Win ")
+st.set_page_config(page_title="🏆 World Cup Predictor", layout="wide")
+st.title("🏆 Tourney Master (Excel Backend)")
 
 # --- CDN FLAG HELPER ---
 def get_flag_html(team_name):
@@ -239,7 +239,8 @@ elif choice == "🛠️ Admin" and st.session_state.role == "admin":
             display_cols = master_df[['tournament', 'Match', 'username', 'Predicted Score']]
             display_cols.columns = ['Tournament', 'Fixture', 'Player', 'Their Prediction']
             
-            st.dataframe(display_cols, use_container_width=True, hide_index=True, unsafe_allow_html=True)
+            # REMOVED unsafe_allow_html=True from st.dataframe()
+            st.dataframe(display_cols, use_container_width=True, hide_index=True)
 
     # Tab 5: Remove Tournament
     with t5:
