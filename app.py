@@ -6,32 +6,20 @@ from data_manager import (
     update_match_teams, delete_tournament, USERS_FILE, MATCHES_FILE, PREDICTIONS_FILE
 )
 
+# --- CONFIGURATION ---
 init_data()
+st.set_page_config(page_title="🏆 JUA HOK JIBON", layout="wide")
+st.title("🏆 FIFA 2026 Predict 2 Win ")
 
-st.set_page_config(page_title="🏆 World Cup Predictor", layout="wide")
-st.title("🏆 Tourney Master (Excel Backend)")
+# --- CDN FLAG HELPER ---
+def get_flag_html(team_name):
+    """Returns an HTML img tag pointing to the official FlagCDN API."""
+    clean_name = str(team_name).replace("MX ", "").replace("ZA ", "").replace("KR ", "").strip()
+    slug = clean_name.lower().replace(" ", "-")
+    url = f"https://flagcdn.com/w40/{slug}.png"
+    return f'<img src="{url}" width="30">'
 
-# --- FLAG DICTIONARY ---
-FLAG_MAP = {
-    "Argentina": "🇦🇷", "Australia": "🇦🇺", "Belgium": "🇧🇪", "Brazil": "🇧🇷",
-    "Canada": "🇨🇦", "Cameroon": "🇨🇲", "Costa Rica": "🇨🇷", "Croatia": "🇭🇷",
-    "Denmark": "🇩🇰", "Ecuador": "🇪🇨", "England": "🏴󠁧󠁢󠁥󠁮󠁧󠁿", "France": "🇫🇷",
-    "Germany": "🇩🇪", "Ghana": "🇬🇭", "Iran": "🇮🇷", "Japan": "🇯🇵",
-    "Mexico": "🇲🇽", "Morocco": "🇲🇦", "Netherlands": "🇳🇱", "Poland": "🇵🇱",
-    "Portugal": "🇵🇹", "Qatar": "🇶🇦", "Saudi Arabia": "🇸🇦", "Senegal": "🇸🇳",
-    "Serbia": "🇷🇸", "South Korea": "🇰🇷", "Spain": "🇪🇸", "Switzerland": "🇨🇭",
-    "Tunisia": "🇹🇳", "Uruguay": "🇺🇾", "USA": "🇺🇸", "Wales": "🏴󠁧󠁢󠁷󠁬󠁳󠁿",
-    "Italy": "🇮🇹", "Colombia": "🇨🇴", "Chile": "🇨🇱", "Peru": "🇵🇪",
-    "Sweden": "🇸🇪", "Nigeria": "🇳🇬", "Egypt": "🇪🇬", "Algeria": "🇩🇿",
-    "Ivory Coast": "🇨🇮", "Mali": "🇲🇱", "South Africa": "🇿🇦", "Jamaica": "🇯🇲",
-    "Panama": "🇵🇦", "Venezuela": "🇻🇪", "Paraguay": "🇵🇾", "Ukraine": "🇺🇦",
-    "Scotland": "🏴󠁧󠁢󠁳󠁣󠁴󠁿", "Turkey": "🇹🇷", "Czech Republic": "🇨🇿", "Hungary": "🇭🇺"
-}
-
-def get_flag(team_name):
-    """Returns the flag emoji for a given team, or a generic flag if not found."""
-    return FLAG_MAP.get(str(team_name).strip(), "🏳️")
-
+# --- SESSION STATE INITIALIZATION ---
 if "logged_in" not in st.session_state:
     st.session_state.update({"logged_in": False, "username": None, "user_id": None, "role": None})
 
@@ -45,6 +33,7 @@ def check_login(user, pwd):
     else:
         st.error("Invalid credentials or deactivated account.")
 
+# --- LOGIN / SIGN UP SCREENS ---
 if not st.session_state.logged_in:
     t1, t2 = st.tabs(["🔑 Login", "📝 Sign Up"])
     with t1:
@@ -66,6 +55,7 @@ if not st.session_state.logged_in:
                 st.success("Registered! Go to Login tab.")
     st.stop()
 
+# --- SIDEBAR NAVIGATION ---
 st.sidebar.write(f"Logged in as: **{st.session_state.username}** ({st.session_state.role})")
 if st.sidebar.button("Logout"):
     st.session_state.logged_in = False
@@ -110,9 +100,11 @@ elif choice == "⚽ Predictions":
             st.write("---")
             col_teamA, col_inputA, col_inputB, col_teamB = st.columns([3,2,2,3])
             
-            # Integrated Flags into the Team Headers
-            with col_teamA: st.markdown(f"### {get_flag(match['team_A'])} {match['team_A']}")
-            with col_teamB: st.markdown(f"### {get_flag(match['team_B'])} {match['team_B']}")
+            # Integrated FlagCDN Flags into the Team Headers with prefix clearing
+            with col_teamA: 
+                st.markdown(f"### {get_flag_html(match['team_A'])} {match['team_A'].replace('MX ','').replace('ZA ','').replace('KR ','')}", unsafe_allow_html=True)
+            with col_teamB: 
+                st.markdown(f"### {get_flag_html(match['team_B'])} {match['team_B'].replace('MX ','').replace('ZA ','').replace('KR ','')}", unsafe_allow_html=True)
             
             user_pred = p_df[(p_df['user_id'] == st.session_state.user_id) & (p_df['match_id'] == match['match_id'])]
             val_A = int(user_pred.iloc[0]['pred_score_A']) if not user_pred.empty else 0
@@ -122,8 +114,8 @@ elif choice == "⚽ Predictions":
             is_admin = st.session_state.role == 'admin'
             lock_fields = is_fin or is_admin
             
-            with col_inputA: p_A = st.number_input(f"Score {match['team_A']}", 0, 100, val_A, key=f"A_{match['match_id']}", disabled=lock_fields)
-            with col_inputB: p_B = st.number_input(f"Score {match['team_B']}", 0, 100, val_B, key=f"B_{match['match_id']}", disabled=lock_fields)
+            with col_inputA: p_A = st.number_input(f"Score {match['team_A'].replace('MX ','').replace('ZA ','').replace('KR ','')}", 0, 100, val_A, key=f"A_{match['match_id']}", disabled=lock_fields)
+            with col_inputB: p_B = st.number_input(f"Score {match['team_B'].replace('MX ','').replace('ZA ','').replace('KR ','')}", 0, 100, val_B, key=f"B_{match['match_id']}", disabled=lock_fields)
             
             # Action Row
             btn_col1, btn_col2 = st.columns([1, 4])
@@ -190,8 +182,7 @@ elif choice == "🛠️ Admin" and st.session_state.role == "admin":
             st.info("No matches waiting to be settled.")
         else:
             for _, m in p_matches.iterrows():
-                # Added flags to the admin scoring view
-                st.write(f"**Match ID {m['match_id']} | {m['tournament']}**: {get_flag(m['team_A'])} {m['team_A']} vs {get_flag(m['team_B'])} {m['team_B']}")
+                st.write(f"**Match ID {m['match_id']} | {m['tournament']}**: {get_flag_html(m['team_A'])} {m['team_A']} vs {get_flag_html(m['team_B'])} {m['team_B']}")
                 col1, col2, col3 = st.columns(3)
                 with col1: sA = st.number_input(f"{m['team_A']} Score", 0, 100, key=f"sA_{m['match_id']}")
                 with col2: sB = st.number_input(f"{m['team_B']} Score", 0, 100, key=f"sB_{m['match_id']}")
@@ -241,14 +232,14 @@ elif choice == "🛠️ Admin" and st.session_state.role == "admin":
             master_df = p_df.merge(u_df[['user_id', 'username']], on='user_id')
             master_df = master_df.merge(m_df[['match_id', 'tournament', 'team_A', 'team_B']], on='match_id')
             
-            # Apply flags to the master DataFrame view!
-            master_df['Match'] = master_df['team_A'].apply(get_flag) + " " + master_df['team_A'] + " vs " + master_df['team_B'].apply(get_flag) + " " + master_df['team_B']
+            # Apply CDN flags to the master DataFrame view dynamically!
+            master_df['Match'] = master_df['team_A'].apply(get_flag_html) + " " + master_df['team_A'] + " vs " + master_df['team_B'].apply(get_flag_html) + " " + master_df['team_B']
             master_df['Predicted Score'] = master_df['pred_score_A'].astype(int).astype(str) + " - " + master_df['pred_score_B'].astype(int).astype(str)
             
             display_cols = master_df[['tournament', 'Match', 'username', 'Predicted Score']]
             display_cols.columns = ['Tournament', 'Fixture', 'Player', 'Their Prediction']
             
-            st.dataframe(display_cols, use_container_width=True, hide_index=True)
+            st.dataframe(display_cols, use_container_width=True, hide_index=True, unsafe_allow_html=True)
 
     # Tab 5: Remove Tournament
     with t5:
@@ -270,13 +261,43 @@ elif choice == "🛠️ Admin" and st.session_state.role == "admin":
 
     # Tab 6: Manage Users
     with t6:
+        st.subheader("👥 Manage Users")
+        
+        # Add New User Expander Form
+        with st.expander("➕ Add New User"):
+            new_username = st.text_input("New Username")
+            new_password = st.text_input("New Password", type="password")
+            if st.button("Create User"):
+                u_df = load_table(USERS_FILE)
+                if new_username in u_df['username'].values:
+                    st.error("Username already exists!")
+                else:
+                    new_id = u_df['user_id'].max() + 1
+                    hpw = hashlib.sha256(new_password.encode()).hexdigest()
+                    new_user = pd.DataFrame([{"user_id": new_id, "username": new_username, "password": hpw, "role": "user", "status": "active"}])
+                    save_table(pd.concat([u_df, new_user], ignore_index=True), USERS_FILE)
+                    st.success(f"User '{new_username}' created!")
+                    st.rerun()
+
+        st.write("---")
+        
+        # List, Disable/Activate, and Delete Users
         u_df = load_table(USERS_FILE)
         for idx, row in u_df[u_df['role'] != 'admin'].iterrows():
-            c_u, c_b = st.columns([3, 1])
-            with c_u: st.write(f"👤 **{row['username']}** | Status: `{row['status']}`")
-            with c_b:
-                label = "Suspend" if row['status'] == 'active' else "Reactivate"
-                if st.button(label, key=f"us_{row['user_id']}"):
+            c1, c2, c3 = st.columns([2, 1, 1])
+            with c1: 
+                status_icon = "🟢" if row['status'] == 'active' else "🔴"
+                st.write(f"{status_icon} **{row['username']}**")
+            
+            with c2:
+                label = "Disable" if row['status'] == 'active' else "Activate"
+                if st.button(label, key=f"tog_{row['user_id']}"):
                     u_df.at[idx, 'status'] = 'inactive' if row['status'] == 'active' else 'active'
+                    save_table(u_df, USERS_FILE)
+                    st.rerun()
+            
+            with c3:
+                if st.button("Delete", key=f"del_{row['user_id']}"):
+                    u_df = u_df.drop(idx)
                     save_table(u_df, USERS_FILE)
                     st.rerun()
