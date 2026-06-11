@@ -143,7 +143,7 @@ elif choice == "⚽ Predictions":
                     display_df = pd.merge(match_preds, u_df, on="user_id", how="inner")
                     for _, p_row in display_df.iterrows():
                         is_current_user = " (You)" if p_row['user_id'] == st.session_state.user_id else ""
-                        st.write(f"👤 **{p_row['username']}{is_current_user}** predicted: `{int(p_row['pred_score_A'])} - {int(p_row['pred_score_B'])}`")
+                        st.write(f"👤 **{p_row['username']}{is_current_user}** predicted: `{int(p_row['pred_score_a'])} - {int(p_row['pred_score_b'])}`")
 
 # --- 3. ADMIN PANEL ---
 elif choice == "🛠️ Admin" and st.session_state.role == "admin":
