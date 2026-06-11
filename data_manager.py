@@ -46,8 +46,7 @@ def load_table(table_name):
 def save_table(df, table_name):
     """
     Synchronizes the remote table with the provided DataFrame using Upsert.
-    Clearing the whole table on every prediction update is unsafe for relational integrity, 
-    so we use upsert to insert or update rows seamlessly without serialization errors.
+    Ensures a single prediction per user per match by looking up pre-existing predictions.
     """
     if df.empty:
         if table_name == USERS_FILE:
@@ -71,19 +70,30 @@ def save_table(df, table_name):
             else:
                 cleaned_record[k] = v
         
-        # If prediction_id is empty, null, or NaN/None, let Supabase auto-increment it
-        if "prediction_id" in cleaned_record:
-            if cleaned_record["prediction_id"] is None or str(cleaned_record["prediction_id"]).strip() in ["", "nan", "None"]:
-                del cleaned_record["prediction_id"]
-            else:
-                cleaned_record["prediction_id"] = int(cleaned_record["prediction_id"])
-        
         # Ensure proper types for numeric fields
         for key in ["user_id", "match_id", "pred_score_a", "pred_score_b"]:
             if key in cleaned_record and cleaned_record[key] is not None:
                 cleaned_record[key] = int(cleaned_record[key])
         if "points_earned" in cleaned_record and cleaned_record["points_earned"] is not None:
             cleaned_record["points_earned"] = float(cleaned_record["points_earned"])
+            
+        # Check for existing predictions by this user for this match to prevent duplicates
+        if table_name == PREDICTIONS_FILE and cleaned_record.get("user_id") is not None and cleaned_record.get("match_id") is not None:
+            existing_check = supabase.table(PREDICTIONS_FILE).select("prediction_id") \
+                .eq("user_id", cleaned_record["user_id"]) \
+                .eq("match_id", cleaned_record["match_id"]) \
+                .execute()
+            
+            # If a prediction already exists, attach its ID so upsert performs an update
+            if existing_check.data:
+                cleaned_record["prediction_id"] = existing_check.data[0]["prediction_id"]
+
+        # If prediction_id is empty, null, or NaN/None, let Supabase auto-increment it
+        if "prediction_id" in cleaned_record:
+            if cleaned_record["prediction_id"] is None or str(cleaned_record["prediction_id"]).strip() in ["", "nan", "None"]:
+                del cleaned_record["prediction_id"]
+            else:
+                cleaned_record["prediction_id"] = int(cleaned_record["prediction_id"])
             
         upsert_records.append(cleaned_record)
         
