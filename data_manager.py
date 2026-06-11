@@ -112,9 +112,9 @@ def load_table(table_name):
         if table_name == USERS_FILE:
             return pd.DataFrame(columns=["user_id", "username", "password", "role", "status"])
         elif table_name == MATCHES_FILE:
-            return pd.DataFrame(columns=["match_id", "tournament", "team_A", "team_B", "actual_score_A", "actual_score_B", "status"])
+            return pd.DataFrame(columns=["match_id", "tournament", "team_a", "team_b", "actual_score_a", "actual_score_b", "status"])
         elif table_name == PREDICTIONS_FILE:
-            return pd.DataFrame(columns=["prediction_id", "user_id", "match_id", "pred_score_A", "pred_score_B", "points_earned"])
+            return pd.DataFrame(columns=["prediction_id", "user_id", "match_id", "pred_score_a", "pred_score_b", "points_earned"])
             
     return pd.DataFrame(data)
 
