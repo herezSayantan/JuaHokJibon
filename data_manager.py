@@ -1,6 +1,8 @@
 import pandas as pd
 import os
 import hashlib
+from supabase import create_client, Client
+import streamlit as st
 
 USERS_FILE = "users.csv"
 MATCHES_FILE = "matches.csv"
@@ -75,10 +77,7 @@ def delete_tournament(tournament_name):
     
     # Filter out any predictions tied to those match IDs
     p_df = p_df[~p_df['match_id'].isin(matches_to_remove)]
-    save_table(p_df, PREDICTIONS_FILE)import pandas as pd
-import hashlib
-from supabase import create_client, Client
-import streamlit as st
+    save_table(p_df, PREDICTIONS_FILE)
 
 # Initialize Supabase Client using Streamlit Secrets
 SUPABASE_URL = st.secrets["SUPABASE_URL"]
