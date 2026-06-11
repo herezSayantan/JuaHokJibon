@@ -1,83 +1,8 @@
 import pandas as pd
-import os
+import numpy as np
 import hashlib
 from supabase import create_client, Client
 import streamlit as st
-
-USERS_FILE = "users.csv"
-MATCHES_FILE = "matches.csv"
-PREDICTIONS_FILE = "predictions.csv"
-
-def init_data():
-    """Initializes the pseudo-Excel sheets if they don't exist."""
-    if not os.path.exists(USERS_FILE):
-        admin_pw = hashlib.sha256("admin123".encode()).hexdigest()
-        df = pd.DataFrame([{
-            "user_id": 1, "username": "admin", "password": admin_pw, "role": "admin", "status": "active"
-        }])
-        df.to_csv(USERS_FILE, index=False)
-
-    if not os.path.exists(MATCHES_FILE):
-        df = pd.DataFrame(columns=["match_id", "tournament", "team_A", "team_B", "actual_score_A", "actual_score_B", "status"])
-        df.to_csv(MATCHES_FILE, index=False)
-
-    if not os.path.exists(PREDICTIONS_FILE):
-        df = pd.DataFrame(columns=["user_id", "match_id", "pred_score_A", "pred_score_B", "points_earned"])
-        df.to_csv(PREDICTIONS_FILE, index=False)
-
-def load_table(file_path):
-    return pd.read_csv(file_path)
-
-def save_table(df, file_path):
-    df.to_csv(file_path, index=False)
-
-def calculate_points(pred_A, pred_B, act_A, act_B):
-    if pred_A == act_A and pred_B == act_B:
-        return 10.0  # Exact match (100%)
-    
-    pred_outcome = 1 if pred_A > pred_B else (-1 if pred_A < pred_B else 0)
-    act_outcome = 1 if act_A > act_B else (-1 if act_A < act_B else 0)
-    
-    if pred_outcome == act_outcome:
-        if (pred_A - pred_B) == (act_A - act_B):
-            return 7.0  # Correct Goal Difference (70%)
-        return 5.0  # Correct Winner/Outcome Only (50%)
-    return 0.0
-
-def update_match_and_scores(match_id, act_A, act_B):
-    matches_df = load_table(MATCHES_FILE)
-    predictions_df = load_table(PREDICTIONS_FILE)
-    
-    matches_df.loc[matches_df['match_id'] == match_id, ['actual_score_a', 'actual_score_b', 'status']] = [act_A, act_B, 'Finished']
-    save_table(matches_df, MATCHES_FILE)
-    
-    for idx, row in predictions_df[predictions_df['match_id'] == match_id].iterrows():
-        pts = calculate_points(row['pred_score_a'], row['pred_score_b'], act_A, act_B)
-        predictions_df.at[idx, 'points_earned'] = pts
-        
-    save_table(predictions_df, PREDICTIONS_FILE)
-
-def update_match_teams(match_id, new_team_A, new_team_B):
-    """Updates placeholder names to actual qualified teams."""
-    matches_df = load_table(MATCHES_FILE)
-    matches_df.loc[matches_df['match_id'] == match_id, ['team_a', 'team_b']] = [new_team_A, new_team_B]
-    save_table(matches_df, MATCHES_FILE)
-
-def delete_tournament(tournament_name):
-    """Deletes all matches and associated predictions for a specific tournament."""
-    m_df = load_table(MATCHES_FILE)
-    p_df = load_table(PREDICTIONS_FILE)
-    
-    # Identify which match IDs belong to this tournament
-    matches_to_remove = m_df[m_df['tournament'] == tournament_name]['match_id'].tolist()
-    
-    # Filter out the tournament from matches
-    m_df = m_df[m_df['tournament'] != tournament_name]
-    save_table(m_df, MATCHES_FILE)
-    
-    # Filter out any predictions tied to those match IDs
-    p_df = p_df[~p_df['match_id'].isin(matches_to_remove)]
-    save_table(p_df, PREDICTIONS_FILE)
 
 # Initialize Supabase Client using Streamlit Secrets
 SUPABASE_URL = st.secrets["SUPABASE_URL"]
@@ -120,25 +45,50 @@ def load_table(table_name):
 
 def save_table(df, table_name):
     """
-    Overwrites/Synchronizes the remote table with the provided DataFrame.
-    Clears old records and inserts the current state.
+    Synchronizes the remote table with the provided DataFrame using Upsert.
+    Clearing the whole table on every prediction update is unsafe for relational integrity, 
+    so we use upsert to insert or update rows seamlessly without serialization errors.
     """
-    # Clear existing records
-    if table_name == USERS_FILE:
-        supabase.table(table_name).delete().neq("user_id", -9999).execute()
-    elif table_name == MATCHES_FILE:
-        supabase.table(table_name).delete().neq("match_id", -9999).execute()
-    elif table_name == PREDICTIONS_FILE:
-        supabase.table(table_name).delete().neq("prediction_id", -9999).execute()
+    if df.empty:
+        if table_name == USERS_FILE:
+            supabase.table(table_name).delete().neq("user_id", -9999).execute()
+        elif table_name == MATCHES_FILE:
+            supabase.table(table_name).delete().neq("match_id", -9999).execute()
+        elif table_name == PREDICTIONS_FILE:
+            supabase.table(table_name).delete().neq("prediction_id", -9999).execute()
+        return
         
-    # Insert new records (stripping out Pandas NaN values)
-    if not df.empty:
-        records = df.where(pd.notnull(df), None).to_dict(orient="records")
-        # Ensure ID columns are omitted on manual updates if auto-incrementing
-        for record in records:
-            if "prediction_id" in record and (record["prediction_id"] is None or str(record["prediction_id"]).strip() == ""):
-                del record["prediction_id"]
-        supabase.table(table_name).insert(records).execute()
+    # Clean NaN/NA values safely for Supabase JSON payload
+    df_clean = df.replace({np.nan: None})
+    records = df_clean.to_dict(orient="records")
+    
+    upsert_records = []
+    for record in records:
+        cleaned_record = {}
+        for k, v in record.items():
+            if pd.isna(v):
+                cleaned_record[k] = None
+            else:
+                cleaned_record[k] = v
+        
+        # If prediction_id is empty, null, or NaN/None, let Supabase auto-increment it
+        if "prediction_id" in cleaned_record:
+            if cleaned_record["prediction_id"] is None or str(cleaned_record["prediction_id"]).strip() in ["", "nan", "None"]:
+                del cleaned_record["prediction_id"]
+            else:
+                cleaned_record["prediction_id"] = int(cleaned_record["prediction_id"])
+        
+        # Ensure proper types for numeric fields
+        for key in ["user_id", "match_id", "pred_score_a", "pred_score_b"]:
+            if key in cleaned_record and cleaned_record[key] is not None:
+                cleaned_record[key] = int(cleaned_record[key])
+        if "points_earned" in cleaned_record and cleaned_record["points_earned"] is not None:
+            cleaned_record["points_earned"] = float(cleaned_record["points_earned"])
+            
+        upsert_records.append(cleaned_record)
+        
+    if upsert_records:
+        supabase.table(table_name).upsert(upsert_records).execute()
 
 def calculate_points(pred_A, pred_B, act_A, act_B):
     if pred_A == act_A and pred_B == act_B:
@@ -157,24 +107,24 @@ def update_match_and_scores(match_id, act_A, act_B):
     matches_df = load_table(MATCHES_FILE)
     predictions_df = load_table(PREDICTIONS_FILE)
     
-    # Update score directly in Supabase DB
+    # Update score directly in Supabase DB with lowercase column names
     supabase.table(MATCHES_FILE).update({
-        "actual_score_A": str(act_A), 
-        "actual_score_B": str(act_B), 
+        "actual_score_a": str(act_A), 
+        "actual_score_b": str(act_B), 
         "status": 'Finished'
     }).eq("match_id", int(match_id)).execute()
     
     # Process prediction scores locally or via updates
     for idx, row in predictions_df[predictions_df['match_id'] == int(match_id)].iterrows():
-        pts = calculate_points(row['pred_score_A'], row['pred_score_B'], int(act_A), int(act_B))
+        pts = calculate_points(row['pred_score_a'], row['pred_score_b'], int(act_A), int(act_B))
         # Update points earned in DB
         supabase.table(PREDICTIONS_FILE).update({"points_earned": float(pts)}).eq("prediction_id", int(row['prediction_id'])).execute()
 
 def update_match_teams(match_id, new_team_A, new_team_B):
-    """Updates placeholder names to actual qualified teams."""
+    """Updates placeholder names to actual qualified teams using lowercase column names."""
     supabase.table(MATCHES_FILE).update({
-        "team_A": str(new_team_A), 
-        "team_B": str(new_team_B)
+        "team_a": str(new_team_A), 
+        "team_b": str(new_team_B)
     }).eq("match_id", int(match_id)).execute()
 
 def delete_tournament(tournament_name):
