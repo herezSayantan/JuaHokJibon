@@ -102,34 +102,34 @@ elif choice == "⚽ Predictions":
             
             # Integrated FlagCDN Flags into the Team Headers with prefix clearing
             with col_teamA: 
-                st.markdown(f"### {get_flag_html(match['team_A'])} {match['team_A'].replace('MX ','').replace('ZA ','').replace('KR ','')}", unsafe_allow_html=True)
+                st.markdown(f"### {get_flag_html(match['team_a'])} {match['team_a'].replace('MX ','').replace('ZA ','').replace('KR ','')}", unsafe_allow_html=True)
             with col_teamB: 
-                st.markdown(f"### {get_flag_html(match['team_B'])} {match['team_B'].replace('MX ','').replace('ZA ','').replace('KR ','')}", unsafe_allow_html=True)
+                st.markdown(f"### {get_flag_html(match['team_b'])} {match['team_b'].replace('MX ','').replace('ZA ','').replace('KR ','')}", unsafe_allow_html=True)
             
             user_pred = p_df[(p_df['user_id'] == st.session_state.user_id) & (p_df['match_id'] == match['match_id'])]
-            val_A = int(user_pred.iloc[0]['pred_score_A']) if not user_pred.empty else 0
-            val_B = int(user_pred.iloc[0]['pred_score_B']) if not user_pred.empty else 0
+            val_A = int(user_pred.iloc[0]['pred_score_a']) if not user_pred.empty else 0
+            val_B = int(user_pred.iloc[0]['pred_score_b']) if not user_pred.empty else 0
             
             is_fin = match['status'] == 'Finished'
             is_admin = st.session_state.role == 'admin'
             lock_fields = is_fin or is_admin
             
-            with col_inputA: p_A = st.number_input(f"Score {match['team_A'].replace('MX ','').replace('ZA ','').replace('KR ','')}", 0, 100, val_A, key=f"A_{match['match_id']}", disabled=lock_fields)
-            with col_inputB: p_B = st.number_input(f"Score {match['team_B'].replace('MX ','').replace('ZA ','').replace('KR ','')}", 0, 100, val_B, key=f"B_{match['match_id']}", disabled=lock_fields)
+            with col_inputA: p_A = st.number_input(f"Score {match['team_a'].replace('MX ','').replace('ZA ','').replace('KR ','')}", 0, 100, val_A, key=f"A_{match['match_id']}", disabled=lock_fields)
+            with col_inputB: p_B = st.number_input(f"Score {match['team_b'].replace('MX ','').replace('ZA ','').replace('KR ','')}", 0, 100, val_B, key=f"B_{match['match_id']}", disabled=lock_fields)
             
             # Action Row
             btn_col1, btn_col2 = st.columns([1, 4])
             
             with btn_col1:
                 if is_fin:
-                    st.caption(f"🔒 Match Settled: {int(match['actual_score_A'])} - {int(match['actual_score_B'])}. Points: {user_pred.iloc[0]['points_earned'] if not user_pred.empty else 0}")
+                    st.caption(f"🔒 Match Settled: {int(match['actual_score_a'])} - {int(match['actual_score_b'])}. Points: {user_pred.iloc[0]['points_earned'] if not user_pred.empty else 0}")
                 elif is_admin:
                     st.caption("🚫 Admin Submission Disabled")
                 else:
                     if st.button("Submit Prediction", key=f"btn_{match['match_id']}"):
                         p_df = load_table(PREDICTIONS_FILE)
                         p_df = p_df[~((p_df['user_id'] == st.session_state.user_id) & (p_df['match_id'] == match['match_id']))]
-                        new_pred = pd.DataFrame([{"user_id": st.session_state.user_id, "match_id": match['match_id'], "pred_score_A": p_A, "pred_score_B": p_B, "points_earned": 0.0}])
+                        new_pred = pd.DataFrame([{"user_id": st.session_state.user_id, "match_id": match['match_id'], "pred_score_a": p_A, "pred_score_b": p_B, "points_earned": 0.0}])
                         p_df = pd.concat([p_df, new_pred], ignore_index=True)
                         save_table(p_df, PREDICTIONS_FILE)
                         st.success("Prediction Saved!")
@@ -157,20 +157,20 @@ elif choice == "🛠️ Admin" and st.session_state.role == "admin":
         if uploaded_file is not None:
             try:
                 uploaded_df = pd.read_csv(uploaded_file)
-                if {"tournament", "team_A", "team_B"}.issubset(uploaded_df.columns):
+                if {"tournament", "team_a", "team_b"}.issubset(uploaded_df.columns):
                     if st.button("Import Entire Schedule Now"):
                         m_df = load_table(MATCHES_FILE)
                         start_id = m_df['match_id'].max() + 1 if not m_df.empty else 1
                         uploaded_df['match_id'] = range(int(start_id), int(start_id + len(uploaded_df)))
-                        uploaded_df['actual_score_A'] = ""
-                        uploaded_df['actual_score_B'] = ""
+                        uploaded_df['actual_score_a'] = ""
+                        uploaded_df['actual_score_b'] = ""
                         uploaded_df['status'] = "Pending"
-                        uploaded_df = uploaded_df[["match_id", "tournament", "team_A", "team_B", "actual_score_A", "actual_score_B", "status"]]
+                        uploaded_df = uploaded_df[["match_id", "tournament", "team_a", "team_b", "actual_score_a", "actual_score_b", "status"]]
                         save_table(pd.concat([m_df, uploaded_df], ignore_index=True), MATCHES_FILE)
                         st.success("Entire schedule uploaded perfectly!")
                         st.rerun()
                 else:
-                    st.error("Missing headers. CSV needs exactly: tournament, team_A, team_B")
+                    st.error("Missing headers. CSV needs exactly: tournament, team_a, team_b")
             except Exception as e:
                 st.error(f"Error reading file: {e}")
                 
@@ -182,10 +182,10 @@ elif choice == "🛠️ Admin" and st.session_state.role == "admin":
             st.info("No matches waiting to be settled.")
         else:
             for _, m in p_matches.iterrows():
-                st.write(f"**Match ID {m['match_id']} | {m['tournament']}**: {get_flag_html(m['team_A'])} {m['team_A']} vs {get_flag_html(m['team_B'])} {m['team_B']}")
+                st.write(f"**Match ID {m['match_id']} | {m['tournament']}**: {get_flag_html(m['team_a'])} {m['team_a']} vs {get_flag_html(m['team_b'])} {m['team_b']}")
                 col1, col2, col3 = st.columns(3)
-                with col1: sA = st.number_input(f"{m['team_A']} Score", 0, 100, key=f"sA_{m['match_id']}")
-                with col2: sB = st.number_input(f"{m['team_B']} Score", 0, 100, key=f"sB_{m['match_id']}")
+                with col1: sA = st.number_input(f"{m['team_a']} Score", 0, 100, key=f"sA_{m['match_id']}")
+                with col2: sB = st.number_input(f"{m['team_b']} Score", 0, 100, key=f"sB_{m['match_id']}")
                 with col3: 
                     st.write("")
                     if st.button("Save & Process Points", key=f"set_{m['match_id']}"):
@@ -201,16 +201,16 @@ elif choice == "🛠️ Admin" and st.session_state.role == "admin":
         if m_df.empty:
             st.info("No schedule exists yet.")
         else:
-            match_options = {f"ID {r['match_id']}: {r['team_A']} vs {r['team_B']}": r['match_id'] for _, r in m_df.iterrows()}
+            match_options = {f"ID {r['match_id']}: {r['team_a']} vs {r['team_b']}": r['match_id'] for _, r in m_df.iterrows()}
             selected_match_str = st.selectbox("Select Match to Modify", list(match_options.keys()))
             target_id = match_options[selected_match_str]
             current_match = m_df[m_df['match_id'] == target_id].iloc[0]
             
             col_edit1, col_edit2 = st.columns(2)
             with col_edit1:
-                new_A = st.text_input("Update Team A", value=str(current_match['team_A']))
+                new_A = st.text_input("Update Team A", value=str(current_match['team_a']))
             with col_edit2:
-                new_B = st.text_input("Update Team B", value=str(current_match['team_B']))
+                new_B = st.text_input("Update Team B", value=str(current_match['team_b']))
                 
             if st.button("Save Team Adjustments"):
                 update_match_teams(target_id, new_A, new_B)
@@ -230,11 +230,11 @@ elif choice == "🛠️ Admin" and st.session_state.role == "admin":
             st.info("No predictions have been submitted by any users yet.")
         else:
             master_df = p_df.merge(u_df[['user_id', 'username']], on='user_id')
-            master_df = master_df.merge(m_df[['match_id', 'tournament', 'team_A', 'team_B']], on='match_id')
+            master_df = master_df.merge(m_df[['match_id', 'tournament', 'team_a', 'team_b']], on='match_id')
             
             # Apply CDN flags to the master DataFrame view dynamically!
-            master_df['Match'] = master_df['team_A'].apply(get_flag_html) + " " + master_df['team_A'] + " vs " + master_df['team_B'].apply(get_flag_html) + " " + master_df['team_B']
-            master_df['Predicted Score'] = master_df['pred_score_A'].astype(int).astype(str) + " - " + master_df['pred_score_B'].astype(int).astype(str)
+            master_df['Match'] = master_df['team_a'].apply(get_flag_html) + " " + master_df['team_a'] + " vs " + master_df['team_b'].apply(get_flag_html) + " " + master_df['team_b']
+            master_df['Predicted Score'] = master_df['pred_score_a'].astype(int).astype(str) + " - " + master_df['pred_score_b'].astype(int).astype(str)
             
             display_cols = master_df[['tournament', 'Match', 'username', 'Predicted Score']]
             display_cols.columns = ['Tournament', 'Fixture', 'Player', 'Their Prediction']
